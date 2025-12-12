@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>팀전 구인 게시판</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+
+/* ===== 기본 레이아웃 ===== */
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px;
+    background: #f5f5f5;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+/* 두 컬럼 배치 */
+.layout {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.col {
+    flex: 1 1 340px;
+    min-width: 0;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+.post-body { text-align: left !important; }
+    
+/* ===== 폼 영역 ===== */
+
+label {
+    font-size: 13px;
+    font-weight: 600;
+    display: block;
+    margin-top: 6px;
+    margin-bottom: 4px;
+}
+
+.required-star {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.optional-label {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 12px;
+    margin-left: 4px;
+}
+
+.form-note {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 10px;
+}
+
+/* 입력칸 */
+textarea,
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin: 0 0 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+    font-size: 14px;
+    vertical-align: top;
+}
+
+/* 라디오 버튼 그룹 */
+.inline-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.option-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    color: #111827;
+    user-select: none;
+}
+
+.option-pill input[type="radio"] {
+    margin: 0;
+    transform: scale(1.4);
+    accent-color: #2563eb;
+}
+
+.option-pill input[type="radio"]:checked + span {
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+/* 멤버 입력칸 */
+.members-inputs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.members-inputs input {
+    flex: 1 1 80px;
+    max-width: 110px;
+    text-align: center;
+}
+
+/* 등록 버튼을 크게 */
+button.primary {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+}
+
+/* ===== 카드 스타일 ===== */
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.post-title-area h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    margin-left: 6px;
+}
+
+.badge-open {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-closed {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.delete-btn {
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+}
+.delete-btn:hover {
+    color: #ef4444;
+}
+
+.meta { font-size: 12px; color: #666; margin-bottom: 8px; }
+
+.members-line {
+    font-size: 13px;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.game-time {
+    font-size: 15px;
+    color: #2563eb;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.post-body {
+    white-space: pre-wrap;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.post-actions {
+    text-align: right;
+    margin-bottom: 6px;
+}
+
+button.danger {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 4px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button.danger[disabled] {
+    background: #9ca3af;
+    cursor: default;
+}
+
+/* ===== 댓글 영역 ===== */
+
+.comments-section {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.comment-count {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.toggle-comments-btn {
+    margin-bottom: 4px;
+    background: #e5e7eb;
+    color: #111827;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: none;
+}
+
+.comment {
+    margin-bottom: 4px;
+}
+
+.comment .author {
+    font-weight: 600;
+}
+
+.comment-form {
+    margin-top: 8px;
+}
+
+.small {
+    font-size: 11px;
+    color: #666;
+}
+
+.footer-meta {
+    margin-top: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.edit-btn {
+    font-size: 12px;
+    background: #e5e7eb;
+    color: #111827;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: none;
+}
+
+@media (max-width: 700px) {
+    .layout { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<h1>팀전 구인 게시판</h1>
+
+<div class="layout">
+<div class="col">
+
+<div class="card">
+    <h2 id="form-title">새 글 쓰기</h2>
+    <div class="form-note">
+        아래 항목 중 <span class="required-star">*</span> 표시는 필수 입력입니다.
+    </div>
+
+    <form id="post-form">
+        <!-- 모집 목적 -->
+<label>모집 목적<span class="required-star">*</span></label>
+<div class="inline-group">
+    <label class="option-pill">
+        <input type="radio" name="post-purpose" value="상대팀 구함" checked />
+        <span>상대팀 구함</span>
+    </label>
+    <label class="option-pill">
+        <input type="radio" name="post-purpose" value="용병 구함" />
+        <span>용병 구함</span>
+    </label>
+    <label class="option-pill">
+        <input type="radio" name="post-purpose" value="용병 가요" />
+        <span>용병 가요</span>
+    </label>
+</div>
+
+
+        <!-- 팀 구성 -->
+       <label>
+    팀 구성<span class="required-star">*</span>
+    <span class="optional-label">(중복 선택 가능)</span>
+</label>
+
+<div class="inline-group">
+    <label class="option-pill">
+        <input type="checkbox" name="post-mode" value="2:2" />
+        <span>2:2</span>
+    </label>
+    <label class="option-pill">
+        <input type="checkbox" name="post-mode" value="3:3" />
+        <span>3:3</span>
+    </label>
+    <label class="option-pill">
+        <input type="checkbox" name="post-mode" value="4:4" />
+        <span>4:4</span>
+    </label>
+</div>
+
+
+        <!-- 멤버 -->
+        <label>멤버<span class="required-star">*</span>
+            <span class="optional-label">(최대 4명, 1명 이상 필수)</span>
+        </label>
+
+        <div class="members-inputs">
+            <input type="text" id="member1" placeholder="멤버1" maxlength="6" />
+            <input type="text" id="member2" placeholder="멤버2" maxlength="6" />
+            <input type="text" id="member3" placeholder="멤버3" maxlength="6" />
+            <input type="text" id="member4" placeholder="멤버4" maxlength="6" />
+        </div>
+
+        <!-- 게임할 시간 -->
+        <label for="post-time">게임할 시간<span class="required-star">*</span></label>
+        <input type="text" id="post-time" placeholder="예: 지금 당장 / 오후 10시부터" />
+
+        <!-- 비밀번호 -->
+        <label for="post-password">
+            비밀번호<span class="required-star">*</span>
+            <span class="optional-label">(마감/삭제/수정용, 4자리 숫자 추천)</span>
+        </label>
+        <input type="password" id="post-password" placeholder="비밀번호를 입력하세요" />
+
+        <!-- 메모 -->
+        <label for="post-memo">
+            메모 <span class="optional-label">(선택)</span>
+        </label>
+        <textarea id="post-memo" rows="4" placeholder="요청사항 또는 하고 싶은 말이 있으면 적어주세요."></textarea>
+
+        <button class="primary" type="submit" id="post-submit-btn">등록</button>
+    </form>
+</div>
+</div>
+
+<!-- 오른쪽 글 목록 -->
+<div class="col">
+    <div id="post-list"></div>
+</div>
+
+</div> <!-- layout 끝 -->
+
+<!-- Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<script>
+async function handleCommentSubmit(e, postId) {
+    e.preventDefault();
+
+    postId = Number(postId);
+
+    const form = e.target;
+    const nickname = form.nickname.value.trim();
+    const content = form.content.value.trim();
+
+    if (!nickname || !content) {
+        alert("닉네임과 내용을 입력하세요.");
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from(COMMENTS_TABLE)
+        .insert({
+            post_id: postId,
+            nickname,
+            content
+        });
+
+    if (error) {
+        console.error(error);
+        alert("댓글 등록 실패");
+        return;
+    }
+
+    form.nickname.value = "";
+    form.content.value = "";
+
+    // 댓글 다시 불러오기
+    loadComments(postId);
+}
+
+/* ===== Supabase 연결 ===== */
+const SUPABASE_URL = "https://xmxmtdkypwlofuybydpk.supabase.co";
+const SUPABASE_ANON_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhteG10ZGt5cHdsb2Z1eWJ5ZHBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MzM0ODgsImV4cCI6MjA4MTAwOTQ4OH0.Od3ARQDv4A6N-hr5KlsfM8ML957y8rgfu5pzgMGyZ2w";
+
+const POSTS_TABLE = "team_posts";
+const COMMENTS_TABLE = "team_comments";
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let editingPostId = null;
+
+/* ========================================================================
+   글 목록 불러오기 (06시 기준 초기화 + 마감 후 3시간 유지)
+======================================================================== */
+async function loadPosts() {
+    const listEl = document.getElementById("post-list");
+    listEl.innerHTML = "<div class='card'>불러오는 중...</div>";
+
+    const { data, error } = await supabaseClient
+        .from(POSTS_TABLE)
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        listEl.innerHTML = "<div class='card'>로드 실패</div>";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        listEl.innerHTML = "<div class='card'>아직 글이 없습니다.</div>";
+        return;
+    }
+
+    const now = new Date();
+
+    let resetBase = new Date();
+    resetBase.setHours(6, 0, 0, 0);
+    if (now < resetBase) resetBase.setDate(resetBase.getDate() - 1);
+
+    listEl.innerHTML = "";
+
+    for (const post of data) {
+        let visible = true;
+        const created = new Date(post.created_at);
+
+        // 새벽 6시 이전 글 숨기기
+        if (created < resetBase) visible = false;
+
+        // 마감된 글은 3시간만 표시
+        if (visible && post.closed) {
+            if (!post.closed_at) visible = false;
+            else {
+                const diff = now - new Date(post.closed_at);
+                if (diff > 3 * 60 * 60 * 1000) visible = false;
+            }
+        }
+
+        if (!visible) continue;
+
+        /* ===== 제목 문구 만들기 (체크박스 여러 개 대응) ===== */
+
+// 1) DB에서 온 post.mode는 "2:2,3:3,4:4" 이런 문자열일 수 있음
+const modeList = (post.mode || "")
+  .split(",")           // ["2:2", "3:3", "4:4"]
+  .map(s => s.trim())   // 공백 제거
+  .filter(Boolean);     // 빈 문자열 제거
+
+// 2) 화면에 보여줄 때는 "2:2 · 3:3 · 4:4" 이런 식으로
+const modeText = modeList.length ? modeList.join(" · ") : "";
+
+// 3) 최종 제목: 모드 + 목적 같이 붙이기
+//    예) "2:2 · 3:3 · 4:4 · 용병 가요"
+const titleText =
+  modeText && post.purpose
+    ? `${modeText} · ${post.purpose}`
+    : (modeText || post.purpose || "");
+
+
+        /* ===== 멤버들 ===== */
+        const members = [
+            post.member1, post.member2, post.member3, post.member4
+        ].filter(v => v && v.trim() !== "");
+
+        const membersHtml = members.length
+            ? `<div class="members-line">멤버: ${members.map(escapeHtml).join(" / ")}</div>`
+            : "";
+
+        /* ===== 카드 실제 HTML 만들기 ===== */
+        const card = document.createElement("div");
+        card.className = "card";
+
+     card.innerHTML = `
+  <div class="post-header">
+    <h2 style="font-size:22px; font-weight:700; margin:0;">
+      ${escapeHtml(titleText)}
+      ${post.closed 
+        ? "<span class='badge badge-closed'>마감됨</span>" 
+        : "<span class='badge badge-open'>모집중</span>"
+      }
+    </h2>
+
+    <button class="delete-btn" onclick="deletePost(${post.id})">×</button>
+  </div>
+
+  <div class="game-time" style="font-size:18px; color:#2563eb; font-weight:700; margin-top:4px;">
+    ${escapeHtml(post.game_time || "")}
+  </div>
+
+  <div class="members-line" style="font-size:17px; margin-top:8px; margin-bottom:10px; font-weight:600;">
+    멤버: ${members.map(escapeHtml).join(" / ")}
+  </div>
+
+  <div class="post-body" 
+     style="font-size:17px; line-height:1.5; margin-bottom:12px; text-align:left;">
+  ${escapeHtml(post.memo || "")}
+</div>
+
+
+  <div class="post-actions">
+    ${
+      post.closed
+        ? "<button class='danger' disabled>마감됨</button>"
+        : `<button class='danger' onclick="closePost(${post.id})">이 글 마감하기</button>`
+    }
+  </div>
+
+ <div class="comments-section" style="margin-top:12px;">
+
+    <!-- 댓글 개수 (먼저 표시) -->
+    <span id="comment-count-${post.id}" class="comment-count">댓글 0개</span>
+
+    <!-- 댓글 보기/접기 버튼 -->
+    <button class="toggle-comments-btn"
+            id="toggle-comments-${post.id}"
+            onclick="toggleComments(${post.id})">
+        댓글 보기
+    </button>
+
+    <!-- 댓글 리스트 박스 -->
+    <div id="comments-container-${post.id}" class="comments" style="display:none; margin-top:6px;">
+        <div id="comments-${post.id}" class="comments-list small">
+            불러오는 중...
+        </div>
+
+        <form class="comment-form" onsubmit="handleCommentSubmit(event, ${post.id})">
+            <input type="text" name="nickname" placeholder="닉네임" required />
+            <input type="text" name="content" placeholder="댓글 내용" required />
+            <button type="submit">댓글 등록</button>
+        </form>
+    </div>
+</div>
+
+
+  <div class="footer-meta">
+    <span class="small">${formatDate(post.created_at)}</span>
+    <button class="edit-btn" onclick="startEdit(${post.id})">수정하기</button>
+  </div>
+`;
+
+
+        listEl.appendChild(card);
+requestAnimationFrame(() => loadComments(post.id));
+
+    }
+
+    if (!listEl.hasChildNodes()) {
+        listEl.innerHTML = "<div class='card'>표시할 글이 없습니다.</div>";
+    }
+}
+/* ============================
+   댓글 접기 / 펼치기
+============================ */
+function toggleComments(postId) {
+    const box = document.getElementById(`comments-container-${postId}`);
+    const btn = document.getElementById(`toggle-comments-${postId}`);
+
+    const hide = box.style.display === "none" || box.style.display === "";
+    box.style.display = hide ? "block" : "none";
+    btn.textContent = hide ? "댓글 접기" : "댓글 보기";
+}
+
+/* ============================
+   댓글 불러오기
+============================ */
+async function loadComments(postId) {
+    postId = Number(postId);
+    const list = document.getElementById(`comments-${postId}`);
+    const countEl = document.getElementById(`comment-count-${postId}`);
+
+    const { data, error } = await supabaseClient
+        .from(COMMENTS_TABLE)
+        .select("*")
+        .eq("post_id", postId)
+        .order("created_at");
+
+    if (error) {
+        list.innerHTML = "<div>댓글 로드 실패</div>";
+        countEl.textContent = "댓글 0개";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        list.innerHTML = "<div class='small'>댓글 없음</div>";
+        countEl.textContent = "댓글 0개";
+        return;
+    }
+
+    list.innerHTML = "";
+
+    for (const c of data) {
+        const div = document.createElement("div");
+        div.className = "comment";
+
+        div.innerHTML = `
+            <span class="author">${escapeHtml(c.nickname)}</span>:
+            ${escapeHtml(c.content)}
+            <span class="small">(${formatTime(c.created_at)})</span>
+        `;
+
+        list.appendChild(div);
+    }
+
+    countEl.textContent = `댓글 ${data.length}개`;
+}
+/* ============================
+   글 마감
+============================ */
+async function closePost(postId) {
+    const pw = prompt("마감하려면 비밀번호 입력");
+
+    if (pw === null) return;
+
+    const closedAt = new Date().toISOString();
+
+    const { data } = await supabaseClient
+        .from(POSTS_TABLE)
+        .update({
+            closed: true,
+            closed_at: closedAt,
+        })
+        .eq("id", postId)
+        .eq("password", pw.trim())
+        .select("id");
+
+    if (!data || data.length === 0) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return;
+    }
+
+    loadPosts();
+}
+
+/* ============================
+   글 삭제 (마감 시점을 과거로 밀어서 숨김)
+============================ */
+async function deletePost(postId) {
+    const pw = prompt("삭제하려면 비밀번호 입력 (복구 불가)");
+
+    if (pw === null) return;
+
+    const closedAt = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
+
+    const { data } = await supabaseClient
+        .from(POSTS_TABLE)
+        .update({
+            closed: true,
+            closed_at: closedAt,
+        })
+        .eq("id", postId)
+        .eq("password", pw.trim())
+        .select("id");
+
+    if (!data || data.length === 0) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return;
+    }
+
+    alert("삭제되었습니다.");
+    loadPosts();
+}
+/* ============================
+   글 수정 (폼 불러오기)
+============================ */
+async function startEdit(postId) {
+    const pw = prompt("수정하려면 비밀번호 입력");
+
+    if (pw === null) return;
+
+    const { data } = await supabaseClient
+        .from(POSTS_TABLE)
+        .select("*")
+        .eq("id", postId)
+        .eq("password", pw.trim());
+
+    if (!data || data.length === 0) {
+        alert("비밀번호가 틀립니다.");
+        return;
+    }
+
+    const post = data[0];
+    editingPostId = postId;
+
+    // 모집 목적
+    document.querySelectorAll('input[name="post-purpose"]').forEach(i => {
+        i.checked = i.value === post.purpose;
+    });
+
+    // 팀 구성 (체크박스용)
+const savedModes = (post.mode || "")
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);   // ["2:2", "3:3"] 이런 식
+
+document.querySelectorAll('input[name="post-mode"]').forEach(i => {
+    i.checked = savedModes.includes(i.value);
+});
+
+    // 멤버
+    document.getElementById("member1").value = post.member1 || "";
+    document.getElementById("member2").value = post.member2 || "";
+    document.getElementById("member3").value = post.member3 || "";
+    document.getElementById("member4").value = post.member4 || "";
+
+    document.getElementById("post-time").value = post.game_time || "";
+    document.getElementById("post-memo").value = post.memo || "";
+
+    document.getElementById("post-password").value = ""; // 보안상 빈칸 유지
+
+    document.getElementById("form-title").textContent = "글 수정하기";
+    document.getElementById("post-submit-btn").textContent = "수정 완료";
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+/* ============================
+   글 작성 / 수정 제출
+============================ */
+document.getElementById("post-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const purpose = document.querySelector('input[name="post-purpose"]:checked')?.value;
+
+    // 체크된 팀 구성들(2:2, 3:3, 4:4) 모으기
+    const modeNodes = document.querySelectorAll('input[name="post-mode"]:checked');
+    const modes = Array.from(modeNodes).map(i => i.value);   // 예: ["2:2", "3:3"]
+
+    const member1 = document.getElementById("member1").value.trim();
+    const member2 = document.getElementById("member2").value.trim();
+    const member3 = document.getElementById("member3").value.trim();
+    const member4 = document.getElementById("member4").value.trim();
+
+    const game_time = document.getElementById("post-time").value.trim();
+    const password = document.getElementById("post-password").value.trim();
+    const memo = document.getElementById("post-memo").value.trim();
+
+    const members = [member1, member2, member3, member4].filter(v => v !== "");
+
+    // 필수값 체크
+    if (!purpose || modes.length === 0 || members.length === 0 || !game_time) {
+        alert("모집 목적, 팀 구성(최소 1개 이상), 멤버(1명 이상), 게임할 시간은 필수입니다.");
+        return;
+    }
+
+    /* ========================================
+       신규 글 작성 vs 수정
+    ======================================== */
+    if (!editingPostId) {
+        // 신규 글 작성 시 비밀번호 필수
+        if (!password) {
+            alert("새 글 작성 시 비밀번호는 필수입니다.");
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from(POSTS_TABLE)
+            .insert({
+                purpose,
+                mode: modes.join(","),   // "2:2,3:3" 이런 식으로 저장
+                nickname: members[0],    // 대표 닉네임 = 첫 번째 멤버
+                member1,
+                member2,
+                member3,
+                member4,
+                game_time,
+                memo,
+                password,
+                closed: false
+            });
+
+        if (error) {
+            console.error(error);
+            alert("글 등록 실패");
+            return;
+        }
+    } else {
+        // 기존 글 수정
+        const { error } = await supabaseClient
+            .from(POSTS_TABLE)
+            .update({
+                purpose,
+                mode: modes.join(","),   // 수정도 같은 형식으로 저장
+                member1,
+                member2,
+                member3,
+                member4,
+                nickname: members[0],
+                game_time,
+                memo
+            })
+            .eq("id", editingPostId);
+
+        if (error) {
+            console.error(error);
+            alert("글 수정 실패");
+            return;
+        }
+
+        // 수정 모드 종료
+        editingPostId = null;
+        document.getElementById("form-title").textContent = "새 글 쓰기";
+        document.getElementById("post-submit-btn").textContent = "등록";
+    }
+
+    // 입력칸 초기화
+    document.getElementById("member1").value = "";
+    document.getElementById("member2").value = "";
+    document.getElementById("member3").value = "";
+    document.getElementById("member4").value = "";
+    document.getElementById("post-time").value = "";
+    document.getElementById("post-password").value = "";
+    document.getElementById("post-memo").value = "";
+
+    // 모집 목적 기본값
+    document.querySelectorAll('input[name="post-purpose"]').forEach(i => {
+        i.checked = i.value === "상대팀 구함";
+    });
+
+    // 팀 구성(체크박스) 초기화: 전부 해제
+    document.querySelectorAll('input[name="post-mode"]').forEach(i => {
+        i.checked = false;
+    });
+
+    loadPosts();
+});
+
+
+/* ============================
+   유틸 함수들
+============================ */
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+function formatDate(iso) {
+    const d = new Date(iso);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `${y}-${m}-${day} ${hh}:${mm}`;
+}
+
+function formatTime(iso) {
+    const d = new Date(iso);
+    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
+// 첫 로딩
+loadPosts();
+</script>
+
+</body>
+</html>

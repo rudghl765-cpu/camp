@@ -1,1 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>통합 게시판</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+}
 
+#tab-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 0;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.tab-btn {
+    padding: 8px 20px;
+    font-size: 15px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    cursor: pointer;
+    background: #e5e7eb;
+    color: #374151;
+    font-weight: 600;
+}
+.tab-btn.active {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+#frame-container {
+    width: 100%;
+    height: calc(100vh - 60px);
+}
+
+.view-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: none;
+}
+
+.view-frame.active {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<!-- ====================== 탭 메뉴 ====================== -->
+<div id="tab-bar">
+    <button class="tab-btn active" onclick="showView('solo')">1 : 1</button>
+    <button class="tab-btn" onclick="showView('team')">팀전</button>
+</div>
+
+<!-- ====================== iframe 컨테이너 ====================== -->
+<div id="frame-container">
+    <!-- 형이 만든 1vs1 사이트 파일 이름: solo.html -->
+    <iframe id="solo" class="view-frame active" src="solo.html"></iframe>
+
+    <!-- 형이 만든 팀전 사이트 파일 이름: team.html -->
+    <iframe id="team" class="view-frame" src="team.html"></iframe>
+</div>
+
+<script>
+function showView(view) {
+    document.querySelectorAll(".view-frame").forEach(f => f.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+
+    document.getElementById(view).classList.add("active");
+
+    if (view === "solo") {
+        document.querySelectorAll(".tab-btn")[0].classList.add("active");
+    } else {
+        document.querySelectorAll(".tab-btn")[1].classList.add("active");
+    }
+}
+</script>
+
+</body>
+</html>

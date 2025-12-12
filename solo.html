@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>1vs1 구인 게시판</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    /* 2열 레이아웃 */
+    .layout {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .col {
+      flex: 1 1 340px;
+      min-width: 0;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+
+    /* 카드 헤더 (닉네임 + 배지 + X 버튼) */
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .post-title-area h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+    }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+    }
+    .delete-btn:hover {
+      color: #ef4444;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    /* 닉네임 아래 게임할 시간 표시 */
+    .game-time {
+      font-size: 15px;
+      color: #2563eb;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .form-note {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      display: block;
+      margin-top: 6px;
+      margin-bottom: 2px;
+    }
+    .required-star {
+      color: #ef4444;
+      margin-left: 2px;
+    }
+    .optional-label {
+      font-weight: 500;
+      color: #6b7280;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+
+    textarea, input[type="text"], input[type="password"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      margin: 0 0 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    button {
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button.primary {
+      background: #2563eb;
+      color: white;
+    }
+    button.danger {
+      background: #ef4444;
+      color: white;
+    }
+    button[disabled] {
+      background: #9ca3af;
+      cursor: default;
+    }
+    .post-body {
+      white-space: pre-wrap;
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      margin-left: 4px;
+    }
+    .badge-open {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .badge-closed {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .comments {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 13px;
+    }
+    .comment {
+      margin-bottom: 4px;
+    }
+    .comment .author {
+      font-weight: 600;
+    }
+    .comment-form {
+      margin-top: 8px;
+    }
+    .small {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .toggle-comments-btn {
+      margin-top: 4px;
+      font-size: 12px;
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    /* 댓글 헤더 (개수만 위에 표시) */
+    .comments-header {
+      margin-top: 4px;
+      margin-bottom: 0;
+    }
+    .comment-count {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    /* 마감 버튼 오른쪽 정렬 */
+    .post-actions {
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    /* 카드 맨 아래 오른쪽 작성 시간 */
+    .footer-meta {
+      margin-top: 4px;
+      text-align: right;
+    }
+    .footer-meta .small {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    @media (max-width: 700px) {
+      .layout {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>1vs1 구인 게시판</h1>
+
+  <div class="layout">
+    <!-- 왼쪽: 글 작성 폼 -->
+    <div class="col">
+      <div class="card">
+        <h2>새 글 쓰기</h2>
+        <div class="form-note">
+          <span class="required-star">*</span> 표시된 항목은 필수 입력입니다.
+        </div>
+        <form id="post-form">
+          <label for="post-nickname">
+            닉네임<span class="required-star">*</span>
+          </label>
+          <input
+            type="text"
+            id="post-nickname"
+            placeholder="예: dozy괴물"
+            required
+          />
+
+          <label for="post-password">
+            비밀번호<span class="required-star">*</span>
+            <span class="optional-label">(마감/삭제/확인용, 4자리 숫자 추천)</span>
+          </label>
+          <input
+            type="password"
+            id="post-password"
+            placeholder="비밀번호를 입력하세요"
+            required
+          />
+
+          <label for="post-title">
+            게임할 시간<span class="required-star">*</span>
+          </label>
+          <input
+            type="text"
+            id="post-title"
+            placeholder="예: 지금 당장 / 오후 10시부터"
+            required
+          />
+
+          <label for="post-body">
+            메모
+            <span class="optional-label">(선택)</span>
+          </label>
+          <textarea
+            id="post-body"
+            rows="4"
+            placeholder="하고 싶은 말, 캠루 등 원하는 것들 적으시면 됩니다."
+          ></textarea>
+
+          <button class="primary" type="submit">등록</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 오른쪽: 글 목록 -->
+    <div class="col">
+      <div id="post-list"></div>
+    </div>
+  </div>
+
+  <!-- Supabase JS -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    // 🔧 너의 Supabase 값
+    const SUPABASE_URL = "https://dijlvoxqmpiyxtmlqgtu.supabase.co";
+    const SUPABASE_ANON_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpamx2b3hxbXBpeXh0bWxxZ3R1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzOTYzMjcsImV4cCI6MjA4MDk3MjMyN30.2m3aNwUzz4FhYImjayDPPFYpPQih14BkTIIyDMWu8bc";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // 글 목록 불러오기 + 06시 기준 / 마감 3시간 필터링
+    async function loadPosts() {
+      const listEl = document.getElementById("post-list");
+      listEl.innerHTML = "<div class='card'>불러오는 중...</div>";
+
+      const { data, error } = await supabaseClient
+        .from("posts")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        listEl.innerHTML = "<div class='card'>글 목록을 불러오지 못했습니다.</div>";
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        listEl.innerHTML = "<div class='card'>아직 글이 없습니다. 첫 글을 작성해 보세요!</div>";
+        return;
+      }
+
+      const now = new Date();
+
+      // 마지막 06:00 계산 (지금이 06시 이전이면 어제 06:00, 이후면 오늘 06:00)
+      let resetBase = new Date();
+      resetBase.setHours(6, 0, 0, 0);
+      if (now < resetBase) {
+        resetBase.setDate(resetBase.getDate() - 1);
+      }
+
+      listEl.innerHTML = "";
+      for (const post of data) {
+        const created = new Date(post.created_at);
+        let visible = true;
+
+        // 1) 마지막 06:00 이전에 쓴 글은 안 보이게
+        if (created < resetBase) {
+          visible = false;
+        }
+
+        // 2) 마감된 글은 마감 후 3시간까지만 보이게
+        if (visible && post.closed) {
+          if (!post.closed_at) {
+            visible = false;
+          } else {
+            const closedAt = new Date(post.closed_at);
+            const diffMs = now - closedAt;
+            const threeHoursMs = 3 * 60 * 60 * 1000;
+            if (diffMs > threeHoursMs) {
+              visible = false;
+            }
+          }
+        }
+
+        if (!visible) continue;
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="post-header">
+            <div class="post-title-area">
+              <h2>
+                ${escapeHtml(post.nickname)}
+                ${
+                  post.closed
+                    ? "<span class='badge badge-closed'>마감됨</span>"
+                    : "<span class='badge badge-open'>모집중</span>"
+                }
+              </h2>
+            </div>
+            <button
+              class="delete-btn"
+              title="글 삭제"
+              onclick="deletePost(${post.id})"
+            >
+              ×
+            </button>
+          </div>
+          <div class="game-time">
+            ${escapeHtml(post.title)}
+          </div>
+          <div class="post-body">${escapeHtml(post.body || "")}</div>
+          <div class="post-actions">
+            ${
+              post.closed
+                ? "<button class='danger' disabled>마감됨</button>"
+                : `<button class='danger' onclick="closePost(${post.id})">이 글 마감하기</button>`
+            }
+          </div>
+          <div class="comments-section">
+            <div class="comments-header">
+              <span
+                id="comment-count-${post.id}"
+                class="comment-count"
+              >
+                댓글 불러오는 중...
+              </span>
+            </div>
+            <button
+              type="button"
+              class="toggle-comments-btn"
+              id="toggle-comments-${post.id}"
+              onclick="toggleComments(${post.id})"
+            >
+              댓글 보기
+            </button>
+            <div id="comments-container-${post.id}" class="comments" style="display:none">
+              <div id="comments-${post.id}" class="comments-list">
+                댓글 불러오는 중...
+              </div>
+              <form class="comment-form" onsubmit="handleCommentSubmit(event, ${post.id})">
+                <input type="text" name="nickname" placeholder="닉네임" required />
+                <input type="text" name="content" placeholder="댓글 내용" required />
+                <button type="submit">댓글 등록</button>
+              </form>
+            </div>
+          </div>
+          <div class="footer-meta">
+            <span class="small">${formatDate(post.created_at)}</span>
+          </div>
+        `;
+        listEl.appendChild(card);
+
+        loadComments(post.id);
+      }
+
+      if (!listEl.hasChildNodes()) {
+        listEl.innerHTML = "<div class='card'>현재 표시할 글이 없습니다.</div>";
+      }
+    }
+
+    // 댓글 접기/펼치기
+    function toggleComments(postId) {
+      const container = document.getElementById(`comments-container-${postId}`);
+      const btn = document.getElementById(`toggle-comments-${postId}`);
+      if (!container || !btn) return;
+
+      const isHidden =
+        container.style.display === "none" || container.style.display === "";
+      container.style.display = isHidden ? "block" : "none";
+      btn.textContent = isHidden ? "댓글 접기" : "댓글 보기";
+    }
+
+    // 댓글 불러오기 + 개수 표시
+    async function loadComments(postId) {
+      const commentsEl = document.getElementById(`comments-${postId}`);
+      const countEl = document.getElementById(`comment-count-${postId}`);
+      if (!commentsEl) return;
+
+      const { data, error } = await supabaseClient
+        .from("comments")
+        .select("*")
+        .eq("post_id", postId)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error(error);
+        commentsEl.innerHTML = "<div>댓글을 불러오지 못했습니다.</div>";
+        if (countEl) countEl.textContent = "댓글 불러오기 실패";
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        commentsEl.innerHTML = "<div class='small'>아직 댓글이 없습니다.</div>";
+        if (countEl) countEl.textContent = "댓글 0개";
+        return;
+      }
+
+      commentsEl.innerHTML = "";
+      for (const c of data) {
+        const div = document.createElement("div");
+        div.className = "comment";
+        div.innerHTML = `
+          <span class="author">${escapeHtml(c.nickname)}</span>:
+          <span>${escapeHtml(c.content)}</span>
+          <span class="small"> (${formatTime(c.created_at)})</span>
+        `;
+        commentsEl.appendChild(div);
+      }
+
+      if (countEl) countEl.textContent = `댓글 ${data.length}개`;
+    }
+
+    // 댓글 등록
+    async function handleCommentSubmit(event, postId) {
+      event.preventDefault();
+      const form = event.target;
+      const nickname = form.nickname.value.trim();
+      const content = form.content.value.trim();
+      if (!nickname || !content) return;
+
+      const { error } = await supabaseClient
+        .from("comments")
+        .insert({
+          post_id: postId,
+          nickname: nickname,
+          content: content
+        });
+
+      if (error) {
+        console.error(error);
+        alert("댓글 등록에 실패했습니다.");
+        return;
+      }
+
+      form.reset();
+      loadComments(postId);
+    }
+
+    // 글 마감 (비밀번호 확인 + closed_at 저장)
+    async function closePost(postId) {
+      const pw = prompt("이 글을 마감하려면 비밀번호를 입력하세요.");
+      if (pw === null) return; // 취소
+      const trimmed = pw.trim();
+      if (!trimmed) {
+        alert("비밀번호를 입력하세요.");
+        return;
+      }
+
+      const nowIso = new Date().toISOString();
+
+      const { data, error } = await supabaseClient
+        .from("posts")
+        .update({ closed: true, closed_at: nowIso })
+        .eq("id", postId)
+        .eq("password", trimmed)
+        .select("id");
+
+      if (error) {
+        console.error(error);
+        alert("마감 처리에 실패했습니다.");
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        alert("비밀번호가 올바르지 않습니다.");
+        return;
+      }
+
+      loadPosts();
+    }
+
+    // 글 삭제 (소프트 삭제: 바로 화면에서 안 보이게)
+    async function deletePost(postId) {
+      const pw = prompt(
+        "이 글을 삭제하려면 비밀번호를 입력하세요.\n삭제하면 복구할 수 없습니다."
+      );
+      if (pw === null) return; // 취소
+      const trimmed = pw.trim();
+      if (!trimmed) {
+        alert("비밀번호를 입력하세요.");
+        return;
+      }
+
+      // 🔹 현재 시각보다 4시간 전으로 closed_at 을 강제로 보내버리기 (3시간 필터에 바로 걸리게)
+      const closedAtPast = new Date(
+        Date.now() - 4 * 60 * 60 * 1000
+      ).toISOString();
+
+      // 비밀번호가 맞는 글만 "삭제된 상태"로 업데이트
+      const { data, error } = await supabaseClient
+        .from("posts")
+        .update({
+          closed: true,
+          closed_at: closedAtPast
+        })
+        .eq("id", postId)
+        .eq("password", trimmed)
+        .select("id");
+
+      if (error) {
+        console.error(error);
+        alert("삭제 처리에 실패했습니다.");
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        alert("비밀번호가 올바르지 않습니다.");
+        return;
+      }
+
+      alert("글이 삭제되었습니다.");
+      loadPosts(); // 🔹 필터 때문에 바로 화면에서 사라짐
+    }
+
+    // 글 작성 폼 이벤트
+    document.getElementById("post-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nicknameInput = document.getElementById("post-nickname");
+      const passwordInput = document.getElementById("post-password");
+      const titleInput = document.getElementById("post-title");
+      const bodyInput = document.getElementById("post-body");
+
+      const nickname = nicknameInput.value.trim();
+      const password = passwordInput.value.trim();
+      const title = titleInput.value.trim();
+      const body = bodyInput.value.trim(); // 메모는 비어 있어도 됨
+
+      // 위 세 개만 필수
+      if (!nickname || !password || !title) {
+        alert("닉네임, 비밀번호, 게임할 시간은 필수입니다.");
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from("posts")
+        .insert({
+          nickname: nickname,
+          password: password,
+          title: title,
+          body: body
+        });
+
+      if (error) {
+        console.error(error);
+        alert("글 등록에 실패했습니다.");
+        return;
+      }
+
+      nicknameInput.value = "";
+      passwordInput.value = "";
+      titleInput.value = "";
+      bodyInput.value = "";
+      loadPosts();
+    });
+
+    // HTML escape
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatDate(iso) {
+      const d = new Date(iso);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      return `${y}-${m}-${day} ${hh}:${mm}`;
+    }
+
+    function formatTime(iso) {
+      const d = new Date(iso);
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      return `${hh}:${mm}`;
+    }
+
+    loadPosts();
+  </script>
+</body>
+</html>
