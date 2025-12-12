@@ -288,7 +288,7 @@
       listEl.innerHTML = "<div class='card'>불러오는 중...</div>";
 
       const { data, error } = await supabaseClient
-        .from("posts")
+        .from("solo_posts")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -432,7 +432,7 @@
       if (!commentsEl) return;
 
       const { data, error } = await supabaseClient
-        .from("comments")
+        .from("solo_comments")
         .select("*")
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
@@ -474,7 +474,7 @@
       if (!nickname || !content) return;
 
       const { error } = await supabaseClient
-        .from("comments")
+        .from("solo_comments")
         .insert({
           post_id: postId,
           nickname: nickname,
@@ -504,7 +504,7 @@
       const nowIso = new Date().toISOString();
 
       const { data, error } = await supabaseClient
-        .from("posts")
+        .from("solo_posts")
         .update({ closed: true, closed_at: nowIso })
         .eq("id", postId)
         .eq("password", trimmed)
@@ -543,7 +543,7 @@
 
       // 비밀번호가 맞는 글만 "삭제된 상태"로 업데이트
       const { data, error } = await supabaseClient
-        .from("posts")
+        .from("solo_posts")
         .update({
           closed: true,
           closed_at: closedAtPast
@@ -587,7 +587,7 @@
       }
 
       const { error } = await supabaseClient
-        .from("posts")
+        .from("solo_posts")
         .insert({
           nickname: nickname,
           password: password,
@@ -638,4 +638,5 @@
     loadPosts();
   </script>
 </body>
+
 </html>
