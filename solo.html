@@ -593,7 +593,10 @@ async function closePost(postId) {
     return;
   }
 
-  // 글 삭제 (비밀번호 확인)
+  loadPosts();
+}
+
+// 글 삭제 (비밀번호 확인)
 async function deletePost(postId) {
   const pw = prompt("이 글을 삭제하려면 비밀번호를 입력하세요.");
   if (pw === null) return; // 취소
@@ -618,10 +621,7 @@ async function deletePost(postId) {
     return;
   }
 
-  loadPosts();
-}
-
-
+    
   loadPosts();
 }
 
@@ -699,6 +699,7 @@ async function deletePost(postId) {
 </body>
 
 </html>
+
 
 
 
