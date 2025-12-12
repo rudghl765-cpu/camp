@@ -256,6 +256,20 @@ button.danger[disabled] {
     flex-direction: column;
   }
 }
+    @media (max-width: 700px) {
+  body {
+    max-width: 100%;
+    padding: 12px;
+  }
+}
+
+    @media (max-width: 700px) {
+  .col {
+    width: 100%;
+  }
+}
+
+    
 </style>
 
 </head>
@@ -547,93 +561,36 @@ button.danger[disabled] {
       loadComments(postId);
     }
 
-    // 글 마감 (비밀번호 확인 + closed_at 저장)
-    async function closePost(postId) {
-      const pw = prompt("이 글을 마감하려면 비밀번호를 입력하세요.");
-      if (pw === null) return; // 취소
-      const trimmed = pw.trim();
-      if (!trimmed) {
-        alert("비밀번호를 입력하세요.");
-        return;
-      }
+   // 글 마감 (비밀번호 확인 + closed_at 저장)
+async function closePost(postId) {
+  const pw = prompt("이 글을 마감하려면 비밀번호를 입력하세요.");
+  if (pw === null) return;
+  const trimmed = pw.trim();
+  if (!trimmed) return alert("비밀번호를 입력하세요.");
 
-      const nowIso = new Date().toISOString();
+  const nowIso = new Date().toISOString();
 
-      const { error, count } = await supabaseClient
-  .from("solo_posts")
-  .update({ closed: true, closed_at: nowIso })
-  .eq("id", postId)
-  .eq("password", trimmed)
-  .select("*", { count: "exact" });
+  const { data, error } = await supabaseClient
+    .from("solo_posts")
+    .update({ closed: true, closed_at: nowIso })
+    .eq("id", postId)
+    .eq("password", trimmed)
+    .select("id");
 
-if (error) {
-  console.error(error);
-  alert("마감 처리에 실패했습니다.");
-  return;
+  if (error) {
+    console.error(error);
+    alert("마감 처리에 실패했습니다.");
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    alert("비밀번호가 올바르지 않습니다.");
+    return;
+  }
+
+  loadPosts();
 }
 
-if (count === 0) {
-  alert("비밀번호가 올바르지 않습니다.");
-  return;
-}
-
-
-      if (error) {
-        console.error(error);
-        alert("마감 처리에 실패했습니다.");
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        alert("비밀번호가 올바르지 않습니다.");
-        return;
-      }
-
-      loadPosts();
-    }
-
-    // 글 삭제 (소프트 삭제: 바로 화면에서 안 보이게)
-    async function deletePost(postId) {
-      const pw = prompt(
-        "이 글을 삭제하려면 비밀번호를 입력하세요.\n삭제하면 복구할 수 없습니다."
-      );
-      if (pw === null) return; // 취소
-      const trimmed = pw.trim();
-      if (!trimmed) {
-        alert("비밀번호를 입력하세요.");
-        return;
-      }
-
-      // 🔹 현재 시각보다 4시간 전으로 closed_at 을 강제로 보내버리기 (3시간 필터에 바로 걸리게)
-      const closedAtPast = new Date(
-        Date.now() - 4 * 60 * 60 * 1000
-      ).toISOString();
-
-      // 비밀번호가 맞는 글만 "삭제된 상태"로 업데이트
-      const { data, error } = await supabaseClient
-        .from("solo_posts")
-        .update({
-          closed: true,
-          closed_at: closedAtPast
-        })
-        .eq("id", postId)
-        .eq("password", trimmed)
-        .select("id");
-
-      if (error) {
-        console.error(error);
-        alert("삭제 처리에 실패했습니다.");
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        alert("비밀번호가 올바르지 않습니다.");
-        return;
-      }
-
-      alert("글이 삭제되었습니다.");
-      loadPosts(); // 🔹 필터 때문에 바로 화면에서 사라짐
-    }
 
     // 글 작성 폼 이벤트
     document.getElementById("post-form").addEventListener("submit", async (e) => {
@@ -708,6 +665,7 @@ if (count === 0) {
 </body>
 
 </html>
+
 
 
 
