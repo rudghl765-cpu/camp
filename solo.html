@@ -593,6 +593,35 @@ async function closePost(postId) {
     return;
   }
 
+  // 글 삭제 (비밀번호 확인)
+async function deletePost(postId) {
+  const pw = prompt("이 글을 삭제하려면 비밀번호를 입력하세요.");
+  if (pw === null) return; // 취소
+  const trimmed = pw.trim();
+  if (!trimmed) return alert("비밀번호를 입력하세요.");
+
+  const { data, error } = await supabaseClient
+    .from("solo_posts")
+    .delete()
+    .eq("id", postId)
+    .eq("password", trimmed)
+    .select("id");
+
+  if (error) {
+    console.error(error);
+    alert("삭제에 실패했습니다.");
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    alert("비밀번호가 올바르지 않습니다.");
+    return;
+  }
+
+  loadPosts();
+}
+
+
   loadPosts();
 }
 
@@ -670,6 +699,7 @@ async function closePost(postId) {
 </body>
 
 </html>
+
 
 
 
