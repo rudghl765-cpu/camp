@@ -307,7 +307,7 @@ button.danger[disabled] {
         아래 항목 중 <span class="required-star">*</span> 표시는 필수 입력입니다.
     </div>
 
-    <form id="post-form">
+    <form id="post-form" autocomplete="off">
         <!-- 모집 목적 -->
 <label>모집 목적<span class="required-star">*</span></label>
 <div class="inline-group">
@@ -354,28 +354,28 @@ button.danger[disabled] {
         </label>
 
         <div class="members-inputs">
-            <input type="text" id="member1" placeholder="멤버1" maxlength="6" />
-            <input type="text" id="member2" placeholder="멤버2" maxlength="6" />
-            <input type="text" id="member3" placeholder="멤버3" maxlength="6" />
-            <input type="text" id="member4" placeholder="멤버4" maxlength="6" />
+            <input type="text" id="member1" placeholder="멤버1" maxlength="6" autocomplete="new-password" />
+<input type="text" id="member2" placeholder="멤버2" maxlength="6" autocomplete="new-password" />
+<input type="text" id="member3" placeholder="멤버3" maxlength="6" autocomplete="new-password" />
+<input type="text" id="member4" placeholder="멤버4" maxlength="6" autocomplete="new-password" />
         </div>
 
         <!-- 게임할 시간 -->
         <label for="post-time">게임할 시간<span class="required-star">*</span></label>
-        <input type="text" id="post-time" placeholder="예: 지금 당장 / 오후 10시부터" />
+        <input type="text" id="post-time" placeholder="예: 지금 당장 / 오후 10시부터" autocomplete="new-password" />
 
         <!-- 비밀번호 -->
         <label for="post-password">
             비밀번호<span class="required-star">*</span>
             <span class="optional-label">(마감/삭제/수정용, 4자리 숫자 추천)</span>
         </label>
-        <input type="password" id="post-password" placeholder="비밀번호를 입력하세요" />
+        <input type="password" id="post-password" placeholder="비밀번호를 입력하세요" autocomplete="new-password" />
 
         <!-- 메모 -->
         <label for="post-memo">
             메모 <span class="optional-label">(선택)</span>
         </label>
-        <textarea id="post-memo" rows="4" placeholder="요청사항 또는 하고 싶은 말이 있으면 적어주세요."></textarea>
+        <textarea id="post-memo" rows="4" placeholder="요청사항 또는 하고 싶은 말이 있으면 적어주세요." autocomplete="new-password"></textarea>
 
         <button class="primary" type="submit" id="post-submit-btn">등록</button>
     </form>
@@ -907,3 +907,4 @@ loadPosts();
 
 </body>
 </html>
+
