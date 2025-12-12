@@ -503,12 +503,24 @@
 
       const nowIso = new Date().toISOString();
 
-      const { data, error } = await supabaseClient
-        .from("solo_posts")
-        .update({ closed: true, closed_at: nowIso })
-        .eq("id", postId)
-        .eq("password", trimmed)
-        .select("id");
+      const { error, count } = await supabaseClient
+  .from("solo_posts")
+  .update({ closed: true, closed_at: nowIso })
+  .eq("id", postId)
+  .eq("password", trimmed)
+  .select("*", { count: "exact" });
+
+if (error) {
+  console.error(error);
+  alert("마감 처리에 실패했습니다.");
+  return;
+}
+
+if (count === 0) {
+  alert("비밀번호가 올바르지 않습니다.");
+  return;
+}
+
 
       if (error) {
         console.error(error);
@@ -640,3 +652,4 @@
 </body>
 
 </html>
+
