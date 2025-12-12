@@ -35,11 +35,16 @@ h1 {
 
 .card {
   background: #ffffff;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 24px 20px;   /* ← 여기 증가가 핵심 */
+  margin-bottom: 20px;  /* ← 여기도 늘려줘야 '띄어쓰기'가 팀전처럼 됨 */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
+ 
+    input, textarea {
+  margin-bottom: 14px;   /* 팀전과 동일 간격 */
+}
+
 
 /* ===== 폼 영역 (팀전 스타일로 키우기) ===== */
 
@@ -665,6 +670,7 @@ async function closePost(postId) {
 </body>
 
 </html>
+
 
 
 
