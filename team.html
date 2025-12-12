@@ -290,8 +290,20 @@ button.danger[disabled] {
 }
 
 @media (max-width: 700px) {
-    .layout { flex-direction: column; }
+    body {
+        max-width: 100%;
+        padding: 12px;
+    }
+
+    .layout {
+        flex-direction: column;
+    }
+
+    .col {
+        width: 100%;
+    }
 }
+
 </style>
 </head>
 <body>
@@ -907,4 +919,5 @@ loadPosts();
 
 </body>
 </html>
+
 
